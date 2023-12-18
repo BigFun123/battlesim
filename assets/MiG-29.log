@@ -1,0 +1,60 @@
+Exporter version: 2.93.5, Blender version: 4.0.1
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used :
+		Inline textures     :  false
+		Material Type       :  PBR
+		Positions Precision :  4
+		Normals Precision   :  3
+		UVs Precision       :  3
+		Vert Color Precision:  3
+		Mat Weight Precision:  2
+		Keep Z-up r-handed  :  no
+		Texture directory   :  C:\dev\FlightSim\assets\
+			WARNING: unsupported node type(ShaderNodeTexSky) will trigger baking
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently enabled collection
+	processing begun of skeleton:  Armature, id:  0
+		processing begun of bone:  Bone, index:  0
+		processing begun of bone:  Bone.001, index:  1
+		processing begun of bone:  Bone.002, index:  2
+		processing begun of bone:  LeftAileron, index:  3
+		processing begun of bone:  RightAileron, index:  4
+		processing begun of bone:  Bone.005, index:  5
+		processing begun of bone:  Bone.006, index:  6
+		processing begun of bone:  LeftGear, index:  7
+		processing begun of bone:  RightGear, index:  8
+		processing begun of bone:  FrontGear, index:  9
+		processing action ArmatureAction:  in[1 - 100], out[0 - 100]
+		processing action ArmatureAction.001:  in[0 - 100], out[110 - 210]
+		processing action ArmatureAction.002:  in[0 - 100], out[220 - 320]
+		processing action ArmatureAction.003:  in[0 - 100], out[330 - 430]
+		processing action ArmatureAction.004:  in[0 - 0], out[440 - 440]
+		processing action landinggear:  in[0 - 100], out[450 - 550]
+		processing action pitchup:  in[0 - 100], out[560 - 660]
+		processing action rollleft:  in[0 - 100], out[670 - 770]
+		processing action rollright:  in[0 - 100], out[780 - 880]
+	processing begun of mesh:  m29a-airframe
+		processing begun of material:  m29a-airframe
+========= An error was encountered =========
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\json_exporter.py", line 118, in execute
+    self.fatalError = 'Mesh: ' + mesh.name + ' has un-applied transformations.  This will never work for a mesh with an armature.  Export cancelled'
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\mesh.py", line 151, in __init__
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\baking_recipe.py", line 43, in __init__
+    bjsMaterial = BJSMaterial(bpyMaterial, exporter)
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\material.py", line 109, in __init__
+    # broken out, so can be done later, after it is known baking is not going to be required
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\nodes\abstract.py", line 265, in readMaterialNodeTree
+    return AbstractBJSNode.readNodeTree(node_tree, 'ShaderNodeOutputMaterial', overloadChannels)
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\nodes\abstract.py", line 285, in readNodeTree
+    return AbstractBJSNode(output, topLevelId, overloadChannels)
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\nodes\abstract.py", line 84, in __init__
+    bjsWrapperNode = AbstractBJSNode.GetBJSWrapperNode(nodeSocket.links[0].from_node, nodeSocket.name, overloadChannels)
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\nodes\abstract.py", line 335, in GetBJSWrapperNode
+    return PrincipledBJSNode(bpyNode, socketName, overloadChannels)
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\nodes\principled.py", line 25, in __init__
+    subsurface = self.getDefault('Subsurface')
+  File "C:\Users\User\AppData\Roaming\Blender Foundation\Blender\4.0\scripts\addons\babylon_js\materials\nodes\abstract.py", line 217, in getDefault
+    return self.defaults[socketName]
+ERROR:  'Subsurface'
+========= end of processing =========
+elapsed time:  0 min, 6.0835 secs
