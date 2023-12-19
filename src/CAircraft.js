@@ -1,19 +1,21 @@
 class CAircraft extends IVehicle {
-        landingGear = 1;
+    landingGear = 1;
     landingGearLocked = false;
 
 
     constructor(modelFile, scene) {
         super(modelFile, scene);
         this.maxpower = 60;
+        this.minpower = 0;
         //rates
         this.pitchRate = 0.014;
         this.yawRate = 0.012;
-        this.rollRate = 0.015;
+        this.rollRate = 0.035;
         this.verticalRate = 0.01;
 
         this.finalPitch = 0;
         this.powerRate = 10;
+        this.throttleRate = 0.5;
 
         Bus.subscribe("control", (data) => {
             console.log(data);
@@ -21,7 +23,7 @@ class CAircraft extends IVehicle {
                 this.reset();
                 this.ignition = !this.ignition;
             }
-            if (data.input === "landinggear" ) {
+            if (data.input === "landinggear") {
                 this.toggleLandingGear();
             }
             if (data.input === "reset") {
@@ -31,7 +33,7 @@ class CAircraft extends IVehicle {
     }
 
     reset() {
-        super.reset();        
+        super.reset();
     }
 
     toggleLandingGear() {
@@ -70,7 +72,7 @@ class CAircraft extends IVehicle {
     playFullAnim(name, speed) {
         this.fileContents.animationGroups.forEach((anim) => {
             if (anim.name.toLowerCase() === name.toLowerCase()) {
-               // anim.stop();
+                // anim.stop();
                 //anim.enableBlending = true;
                 anim.loopAnimation = false;
                 if (speed == -1) {
@@ -133,39 +135,25 @@ class CAircraft extends IVehicle {
         });
     }
 
-    addTorque() {
-        var body = this.imposter.body;
-        //var torqueWorld = this.mesh.forward.scale(this.finalRoll).add(this.mesh.up.scale(this.finalYaw)).add(this.mesh.right.scale(this.finalPitchq));
-        var torqueWorld = this.finalTorque;
-        //var torqueWorld = new BABYLON.Vector3(0,this.finalYaw,this.finalPitch);
-
-        var massProps = body.getMassProperties();
-        var worldFromInertia = massProps.inertiaOrientation.multiply(body.transformNode.absoluteRotationQuaternion);
-        var inertiaFromWorld = worldFromInertia.conjugate();
-        var impLocal = torqueWorld.applyRotationQuaternion(inertiaFromWorld);
-        var impWorld = impLocal.multiply(massProps.inertia).applyRotationQuaternion(worldFromInertia);
-        var newAV = body.getAngularVelocity().add(impWorld.scale(this.scene.getPhysicsEngine().getTimeStep()));
-        body.setAngularVelocity(newAV);
-    }
 
 
     integrate() {
         if (this.power) {
-            this.lift = (this.power > 20) ? this.power * 0.001 : 0;
+            this.lift = (this.power > 0.1) ? this.power *0.5 : 0;
         }
 
         this.yaw = Math.min(Math.max(this.yaw, -1), 1);
         this.roll = Math.min(Math.max(this.roll, -1), 1);
         this.pitch = Math.min(Math.max(this.pitch, -1), 1);
 
-        this.power += this.throttle * 0.01;
-        this.power = Math.min(this.maxpower, this.power);
+        this.power = this.throttle * this.throttleRate;
+        this.power = Math.max(Math.min(this.maxpower, this.power), this.minpower)   ;
 
         this.finalPitch = this.pitch * this.pitchRate;
         this.finalYaw = -this.yaw * this.yawRate;
         this.finalRoll = -this.roll * this.rollRate;
         this.finalPower = this.power * this.powerRate;
-        this.finalVertical = this.verticalThrust * this.verticalRate;
+        this.finalVertical = this.verticalThrust * this.verticalRate + this.lift;
 
 
         //this.position.x += x;
@@ -177,7 +165,7 @@ class CAircraft extends IVehicle {
             //const centerOfMass = this.mesh.getAbsolutePosition().add(tran.up.scale(28.1));
             //this.imposter.body.applyForce(tran.forward.scale(this.finalPower), this.mesh.getAbsolutePosition());
 
-            
+
 
             if (this.ignition) {
                 const currRot = this.mesh.rotationQuaternion;
@@ -242,4 +230,20 @@ class CAircraft extends IVehicle {
         //this.playAnim("pitchdown", 1, -this.pitch, -this.pitch);
         //this.playAnim("landingGear", 1, this.landingGear, this.landingGear);
     }
+
+    addTorque() {
+        var body = this.imposter.body;
+        //var torqueWorld = this.mesh.forward.scale(this.finalRoll).add(this.mesh.up.scale(this.finalYaw)).add(this.mesh.right.scale(this.finalPitchq));
+        var torqueWorld = this.finalTorque;
+        //var torqueWorld = new BABYLON.Vector3(0,this.finalYaw,this.finalPitch);
+
+        var massProps = body.getMassProperties();
+        var worldFromInertia = massProps.inertiaOrientation.multiply(body.transformNode.absoluteRotationQuaternion);
+        var inertiaFromWorld = worldFromInertia.conjugate();
+        var impLocal = torqueWorld.applyRotationQuaternion(inertiaFromWorld);
+        var impWorld = impLocal.multiply(massProps.inertia).applyRotationQuaternion(worldFromInertia);
+        var newAV = body.getAngularVelocity().add(impWorld.scale(this.scene.getPhysicsEngine().getTimeStep()));
+        body.setAngularVelocity(newAV);
+    }
+
 }

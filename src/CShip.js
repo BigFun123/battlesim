@@ -1,7 +1,5 @@
 class CShip extends IVehicle {
-    constructor(modelFile, scene) {
-        super(modelFile, scene);
+    constructor(scene) {
+        super(scene);
     }
-
-    setup() {};
 }

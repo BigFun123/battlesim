@@ -29,9 +29,8 @@ class IVehicle {
 
     imposter;
 
-    constructor(model, scene) {
-        this.scene = scene;
-        this.model = model;
+    constructor(scene) {
+        this.scene = scene;        
         this.position = new BABYLON.Vector3(0, 0, 0);
         this.rotation = new BABYLON.Vector3(0, -45 * Math.PI / 180, 0);
         this.scale = new BABYLON.Vector3(1, 1, 1);
@@ -42,7 +41,7 @@ class IVehicle {
         return [`throttle: ${this.throttle.toFixed(2)} power: ${this.power.toFixed(2)} pitch: ${this.pitch.toFixed(2)}/${this.finalPitch.toFixed(2)} roll: ${this.roll.toFixed(2)}/${this.finalRoll.toFixed(2)} yaw: ${this.yaw.toFixed(2)} / ${this.finalYaw.toFixed(2)} vert: ${this.verticalThrust.toFixed(2)}`
             //, `torque: ${this.finalTorque.x.toFixed(2)}, ${this.finalTorque.y.toFixed(2)}, ${this.finalTorque.z.toFixed(2)}`
             // up
-            , `up: ${this.mesh.up.x.toFixed(2)}, ${this.mesh.up.y.toFixed(2)}, ${this.mesh.up.z.toFixed(2)}`
+            , `pos: ${this.mesh.position.x.toFixed(2)},${this.mesh.position.y.toFixed(2)},${this.mesh.position.z.toFixed(2)} up: ${this.mesh.up.x.toFixed(2)}, ${this.mesh.up.y.toFixed(2)}, ${this.mesh.up.z.toFixed(2)}`
         ];
     }
 
@@ -55,13 +54,17 @@ class IVehicle {
         this.verticalThrust = 0;
     }
 
-    setup() {
-
+    async setup(asset) {
+        this.model = asset.file;
+        this.position = new BABYLON.Vector3(asset.position[0], asset.position[1], asset.position[2]);
+        this.static = asset.static;
+        await this.load(asset.file, this.position, asset.static || false);
     }
-    load(position, isStatic) {
+
+    load(model, position, isStatic) {
         this.static = isStatic;
         return new Promise((resolve, reject) => {
-            BABYLON.SceneLoader.ImportMeshAsync("", "/assets/", this.model).then((result) => {
+            BABYLON.SceneLoader.ImportMeshAsync("", "/assets/", model).then((result) => {
                 this.fileContents = result;
                 this.mesh = result.meshes[0];
                 //this.mesh.applyGravity = true;
@@ -102,8 +105,9 @@ class IVehicle {
                             this.mesh.applyGravity = true;
                             //mesh.setEnabled(false);
                             mesh.isVisible = false;
-                            this.imposter = new BABYLON.PhysicsAggregate(mesh, BABYLON.PhysicsShapeType.CONVEX_HULL, { mass: this.static ? 0 : 1000, friction: 0.5, restitution: 0.5 }, this.scene);
-                            this.imposter.body.setMassProperties({centerOfMass: mesh.position});
+                            this.imposter = new BABYLON.PhysicsAggregate(mesh, BABYLON.PhysicsShapeType.CONVEX_HULL, { mass: this.static ? 0 : 100, friction: 0.5, restitution: 0.5 }, this.scene);
+                            mesh.imposter = this.imposter;
+                            //this.imposter.body.setMassProperties({centerOfMass: new BABYLON.Vector3(0, 0, 0), mass: 100, inertia: new BABYLON.Vector3(0, 0, 0)});
 
                             //mesh.receiveShadows = true;
                             console.log("collision mesh found", this.model, mesh.name, "static", this.static);
@@ -118,8 +122,7 @@ class IVehicle {
                         // mesh.receiveShadows = true;
                         //mesh.checkCollisions = true;
                     }
-                });
-                this.setup();
+                });                
                 resolve(this.mesh);
             }).catch((err) => {
                 console.log(err);
@@ -145,7 +148,12 @@ class IVehicle {
         //this.imposter.body.setAbsolutePosition(new BABYLON.Vector3(x, y, z));
         //this.imposter.body.setTargetTransform(new BABYLON.Vector3(x, y, z), new BABYLON.Quaternion(0, 0, 0, 1));
         const plugin = this.scene.getPhysicsEngine().getPhysicsPlugin();
-        plugin.setBodyPosition(this.imposter.body, new BABYLON.Vector3(x, y, z));
+        //plugin.setBodyPosition(this.imposter.body, new BABYLON.Vector3(x, y, z));
+        //plugin.setTargetTransform(this.imposter.body, new BABYLON.Vector3(x, y, z), new BABYLON.Quaternion(0, 0, 0, 1), 1);
+        this.imposter.transformNode.setAbsolutePosition(new BABYLON.Vector3(x, y, z));
+
+        //const plugin = scene.getPhysicsEngine().getPhysicsPlugin()
+        //plugin.HP_Body_SetPosition(mesh.physicsBody._pluginData.hpBodyId, [x, y, z])
     }
 
     getCameraTarget() {
@@ -186,12 +194,12 @@ class IVehicle {
 
     throttleUp() {
         this.throttle += 0.1;
-        //this.throttle = Math.min(this.maxpower + 2, this.throttle);
+        this.throttle = Math.min(2, this.throttle);
     }
 
     throttleDown() {
         this.throttle -= 0.1;
-        //this.throttle = Math.max(0, this.throttle);
+        this.throttle = Math.max(0, this.throttle);
     }
 
     verticalThrustUp() {
