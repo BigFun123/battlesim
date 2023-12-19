@@ -1,6 +1,7 @@
 class CAircraft extends IVehicle {
     landingGear = 1;
     landingGearLocked = false;
+    lift = 0;
 
 
     constructor(modelFile, scene) {
@@ -14,8 +15,7 @@ class CAircraft extends IVehicle {
         this.verticalRate = 0.01;
 
         this.finalPitch = 0;
-        this.powerRate = 10;
-        this.throttleRate = 0.5;
+        this.powerRate = 5;        
 
         Bus.subscribe("control", (data) => {
             console.log(data);
@@ -138,9 +138,9 @@ class CAircraft extends IVehicle {
 
 
     integrate() {
-        if (this.power) {
-            this.lift = (this.power > 0.1) ? this.power *0.5 : 0;
-        }
+        /*if (this.power) {
+            this.lift = (this.power > 0.4) ? this.power *0.5 : 0;
+        }*/
 
         this.yaw = Math.min(Math.max(this.yaw, -1), 1);
         this.roll = Math.min(Math.max(this.roll, -1), 1);
@@ -149,29 +149,41 @@ class CAircraft extends IVehicle {
         this.power = this.throttle * this.throttleRate;
         this.power = Math.max(Math.min(this.maxpower, this.power), this.minpower)   ;
 
-        this.finalPitch = this.pitch * this.pitchRate;
-        this.finalYaw = -this.yaw * this.yawRate;
-        this.finalRoll = -this.roll * this.rollRate;
         this.finalPower = this.power * this.powerRate;
+        this.finalPitch = this.pitch * this.pitchRate;
+        this.finalYaw = -this.yaw * this.yawRate * this.finalPower;
+        this.finalRoll = -this.roll * this.rollRate ;
+
         this.finalVertical = this.verticalThrust * this.verticalRate + this.lift;
+
+        
+
+        
+        // move rotation quaternion to identity
+        //this.mesh.rotationQuaternion = new BABYLON.Quaternion(0, 0, 0, 1);
+
+
+
+
 
 
         //this.position.x += x;
         //this.position.y += y;
         //this.position.z += z;
         if (this.mesh) {
-            let tran = this.imposter.transformNode;
+            let tran = this.aggregate.transformNode;
             //let finalVelocity = tran.forward.scale(this.finalPower);
             //const centerOfMass = this.mesh.getAbsolutePosition().add(tran.up.scale(28.1));
-            //this.imposter.body.applyForce(tran.forward.scale(this.finalPower), this.mesh.getAbsolutePosition());
+            //this.aggregate.body.applyForce(tran.forward.scale(this.finalPower), this.mesh.getAbsolutePosition());
 
 
 
-            if (this.ignition) {
+            if (this.ignition) 
+            {
                 const currRot = this.mesh.rotationQuaternion;
                 const amountToRotateQuat = BABYLON.Quaternion.FromEulerAngles(this.finalPitch, this.finalYaw, this.finalRoll);
                 currRot.multiplyInPlace(amountToRotateQuat);
-                this.imposter.body.setTargetTransform(this.mesh.getAbsolutePosition().add(tran.forward.scale(this.finalPower).add(tran.up.scale(this.finalVertical))), tran.rotationQuaternion, 1);
+                this.aggregate.body.setTargetTransform(this.mesh.getAbsolutePosition().add(tran.forward.scale(this.finalPower).add(tran.up.scale(this.finalVertical))), tran.rotationQuaternion, 1);
             }
 
 
@@ -180,9 +192,9 @@ class CAircraft extends IVehicle {
             //var rollAxis = new BABYLON.Vector3(-1, 0, 0).scale(this.finalRoll);
             //const amountToPitch = BABYLON.Quaternion.FromEulerAngles(this.finalPitch, 0, 0);          
 
-            //this.imposter.body.applyForce(tran.right.scale(this.finalYaw), centerOfMass.add(tran.forward.scale(-20)));            
-            //this.imposter.body.applyForce(tran.up.scale(this.finalPitch), centerOfMass.add(tran.forward.scale(12)));
-            //this.imposter.body.applyForce(tran.up.scale(this.finalRoll), centerOfMass.add(tran.right.scale(17)));
+            //this.aggregate.body.applyForce(tran.right.scale(this.finalYaw), centerOfMass.add(tran.forward.scale(-20)));            
+            //this.aggregate.body.applyForce(tran.up.scale(this.finalPitch), centerOfMass.add(tran.forward.scale(12)));
+            //this.aggregate.body.applyForce(tran.up.scale(this.finalRoll), centerOfMass.add(tran.right.scale(17)));
 
         }
 
@@ -232,7 +244,7 @@ class CAircraft extends IVehicle {
     }
 
     addTorque() {
-        var body = this.imposter.body;
+        var body = this.aggregate.body;
         //var torqueWorld = this.mesh.forward.scale(this.finalRoll).add(this.mesh.up.scale(this.finalYaw)).add(this.mesh.right.scale(this.finalPitchq));
         var torqueWorld = this.finalTorque;
         //var torqueWorld = new BABYLON.Vector3(0,this.finalYaw,this.finalPitch);

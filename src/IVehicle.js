@@ -9,6 +9,7 @@ class IVehicle {
     ignition = 0;
 
     throttle = 0;
+    throttleRate = 5;
     power = 0;
     maxpower = 10;
     yaw = 0;
@@ -27,21 +28,24 @@ class IVehicle {
     finalTorque = { x: 0, y: 0, z: 0 };
     finalVelocity = { x: 0, y: 0, z: 0 };
 
-    imposter;
+    previousPosition = BABYLON.Vector3.Zero();
+
+    aggregate;
 
     constructor(scene) {
-        this.scene = scene;        
+        this.scene = scene;
         this.position = new BABYLON.Vector3(0, 0, 0);
         this.rotation = new BABYLON.Vector3(0, -45 * Math.PI / 180, 0);
         this.scale = new BABYLON.Vector3(1, 1, 1);
         this.mesh = null;
     }
 
-    getDebugText() {        
-        return [`throttle: ${this.throttle.toFixed(2)} power: ${this.power.toFixed(2)} pitch: ${this.pitch.toFixed(2)}/${this.finalPitch.toFixed(2)} roll: ${this.roll.toFixed(2)}/${this.finalRoll.toFixed(2)} yaw: ${this.yaw.toFixed(2)} / ${this.finalYaw.toFixed(2)} vert: ${this.verticalThrust.toFixed(2)}`
+    getDebugText() {
+        return [`throttle: ${this.throttle.toFixed(2)} power: ${this.power.toFixed(2)}/${this.finalPower.toFixed(2)} pitch: ${this.pitch.toFixed(2)}/${this.finalPitch.toFixed(2)} roll: ${this.roll.toFixed(2)}/${this.finalRoll.toFixed(2)} yaw: ${this.yaw.toFixed(2)} / ${this.finalYaw.toFixed(2)} vert: ${this.verticalThrust.toFixed(2)}`
             //, `torque: ${this.finalTorque.x.toFixed(2)}, ${this.finalTorque.y.toFixed(2)}, ${this.finalTorque.z.toFixed(2)}`
             // up
-            , `pos: ${this.mesh.position.x.toFixed(2)},${this.mesh.position.y.toFixed(2)},${this.mesh.position.z.toFixed(2)} up: ${this.mesh.up.x.toFixed(2)}, ${this.mesh.up.y.toFixed(2)}, ${this.mesh.up.z.toFixed(2)}`
+            , `pos: ${this.mesh.position.x.toFixed(2)},${this.mesh.position.y.toFixed(2)},${this.mesh.position.z.toFixed(2)} up: ${this.mesh.up.x.toFixed(2)}, ${this.mesh.up.y.toFixed(2)}, ${this.mesh.up.z.toFixed(2)}`,
+        `rotq: ${this.mesh.rotationQuaternion.x.toFixed(2)}, ${this.mesh.rotationQuaternion.y.toFixed(2)}, ${this.mesh.rotationQuaternion.z.toFixed(2)}, ${this.mesh.rotationQuaternion.w.toFixed(2)}`,
         ];
     }
 
@@ -70,7 +74,7 @@ class IVehicle {
                 //this.mesh.applyGravity = true;
                 //this.mesh.checkCollisions = true;
                 //result.meshes[1].checkCollisions = true;
-                
+
                 result.animationGroups.forEach((animationGroup) => {
                     //animationGroup.play(false);
                     animationGroup.enableBlending = true;
@@ -78,8 +82,8 @@ class IVehicle {
                         animationGroup.play(false);
                         animationGroup.speedRatio = 0;
                     }
-                    
-                    
+
+
                     //animationGroup.syncAllAnimationsWith(null);                    
                     console.log(animationGroup.name);
                     //animationGroup.play(true);
@@ -93,6 +97,7 @@ class IVehicle {
                 //this.mesh.position = this.position;
                 //this.mesh.rotation = this.rotation;
                 //this.mesh.scaling = this.scale;
+                this.enableReflections(this.fileContents.meshes);
 
                 // add shadows to each mesh
                 this.fileContents.meshes.forEach((mesh) => {
@@ -100,14 +105,15 @@ class IVehicle {
                         if (mesh.name === "Collision") {
                             mesh.position = position;
                             this.mesh = mesh;
+                            mesh.vehicle = this;
                             this.mesh.rotationQuaternion = new BABYLON.Quaternion(0, 0, 0, 1);
                             //mesh.checkCollisions = true;
                             this.mesh.applyGravity = true;
                             //mesh.setEnabled(false);
                             mesh.isVisible = false;
-                            this.imposter = new BABYLON.PhysicsAggregate(mesh, BABYLON.PhysicsShapeType.CONVEX_HULL, { mass: this.static ? 0 : 100, friction: 0.5, restitution: 0.5 }, this.scene);
-                            mesh.imposter = this.imposter;
-                            //this.imposter.body.setMassProperties({centerOfMass: new BABYLON.Vector3(0, 0, 0), mass: 100, inertia: new BABYLON.Vector3(0, 0, 0)});
+                            this.aggregate = new BABYLON.PhysicsAggregate(mesh, BABYLON.PhysicsShapeType.CONVEX_HULL, { mass: this.static ? 0 : 100, friction: 0.5, restitution: 0.5 }, this.scene);
+                            mesh.aggregate = this.aggregate;
+                            //this.aggregate.body.setMassProperties({centerOfMass: new BABYLON.Vector3(0, 0, 0), mass: 100, inertia: new BABYLON.Vector3(0, 0, 0)});
 
                             //mesh.receiveShadows = true;
                             console.log("collision mesh found", this.model, mesh.name, "static", this.static);
@@ -118,17 +124,55 @@ class IVehicle {
                             mesh.isVisible = false;
                         }
 
+
+
                         //shadowGenerator.addShadowCaster(mesh);
                         // mesh.receiveShadows = true;
                         //mesh.checkCollisions = true;
                     }
-                });                
+                });
                 resolve(this.mesh);
             }).catch((err) => {
                 console.log(err);
                 reject(err);
             });
         });
+    }
+
+    enableReflections(meshArray) {
+        for (var i = 0; i < meshArray.length; i++) {
+            var mesh = meshArray[i];
+            if (mesh.material) {
+                mesh.material.reflectivityTexture = new BABYLON.Texture("/assets/reflectivity.png", this._scene);
+                mesh.material.useRoughnessFromMetallicTextureAlpha = false;
+                mesh.material.roughness = 0.15;
+            }
+        }
+    }
+
+    getSnapshot() {
+        return  {
+            //x: this.mesh.position.x,
+            //y: this.mesh.position.y,
+            //z: this.mesh.position.z,
+            position: [this.aggregate.transformNode.position.x, this.aggregate.transformNode.position.y, this.aggregate.transformNode.position.z],
+            rotationQuaternion: [this.mesh.rotationQuaternion.x, this.mesh.rotationQuaternion.y, this.mesh.rotationQuaternion.z, this.mesh.rotationQuaternion.w],
+            velocity: this.aggregate.body.getLinearVelocity(),
+            angularVelocity: this.aggregate.body.getAngularVelocity(),            
+        }
+    }
+
+    setSnapshot(snapshot) {
+        
+        this.aggregate.body.disablePreStep = false;
+        //this.mesh.position = new BABYLON.Vector3(snapshot.x, snapshot.y, snapshot.z);        
+        //this.aggregate.transformNode.rotationQuaternion = snapshot.rotation;
+        //this.aggregate.body.setTargetTransform(this.mesh.position, this.mesh.rotationQuaternion, 1);
+        //this.aggregate.body.setAbsolutePosition(this.mesh.position);
+        this.aggregate.transformNode.rotationQuaternion.set(snapshot.rotation.x, snapshot.rotation.y, snapshot.rotation.z, snapshot.rotation.w);
+        this.aggregate.transformNode.position.set(snapshot.x, snapshot.y, snapshot.z);
+        //this.aggregate.body.setLinearVelocity(snapshot.velocity);
+        //this.aggregate.body.setAngularVelocity(snapshot.angularVelocity);
     }
 
     setHome(x, y, z) {
@@ -145,15 +189,19 @@ class IVehicle {
         //if (this.mesh) {
         //  this.mesh.position = new BABYLON.Vector3(x, y, z);
         //}
-        //this.imposter.body.setAbsolutePosition(new BABYLON.Vector3(x, y, z));
-        //this.imposter.body.setTargetTransform(new BABYLON.Vector3(x, y, z), new BABYLON.Quaternion(0, 0, 0, 1));
+        //this.aggregate.body.setAbsolutePosition(new BABYLON.Vector3(x, y, z));
+        //this.aggregate.body.setTargetTransform(new BABYLON.Vector3(x, y, z), new BABYLON.Quaternion(0, 0, 0, 1));
         const plugin = this.scene.getPhysicsEngine().getPhysicsPlugin();
-        //plugin.setBodyPosition(this.imposter.body, new BABYLON.Vector3(x, y, z));
-        //plugin.setTargetTransform(this.imposter.body, new BABYLON.Vector3(x, y, z), new BABYLON.Quaternion(0, 0, 0, 1), 1);
-        this.imposter.transformNode.setAbsolutePosition(new BABYLON.Vector3(x, y, z));
+        //plugin.setBodyPosition(this.aggregate.body, new BABYLON.Vector3(x, y, z));
+        //plugin.setTargetTransform(this.aggregate.body, new BABYLON.Vector3(x, y, z), new BABYLON.Quaternion(0, 0, 0, 1), 1);
+        this.aggregate.transformNode.setAbsolutePosition(new BABYLON.Vector3(x, y, z));
 
         //const plugin = scene.getPhysicsEngine().getPhysicsPlugin()
         //plugin.HP_Body_SetPosition(mesh.physicsBody._pluginData.hpBodyId, [x, y, z])
+    }
+
+    getPosition() {
+        return this.aggregate.transformNode.position;
     }
 
     getCameraTarget() {
@@ -193,7 +241,7 @@ class IVehicle {
     }
 
     throttleUp() {
-        this.throttle += 0.1;
+        this.throttle += this.throttleRate * this.delta;
         this.throttle = Math.min(2, this.throttle);
     }
 

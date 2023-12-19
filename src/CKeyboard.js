@@ -5,6 +5,7 @@ class CKeyboard {
 
         document.addEventListener('keydown', (event) => {
             this.keys[event.code] = true;
+            console.log(event.code);
             //console.log(event);
             if (event.code == "KeyP") {
                 this.scene.debugLayer.show();
@@ -17,6 +18,36 @@ class CKeyboard {
             }
             if (event.code == "Backquote") {
                 Bus.send("control", { input: "reset" });
+            }
+            if (event.code == "Digit1") {
+                Bus.send("camera", 0);
+            }
+            if (event.code == "Digit2") {
+                Bus.send("camera", 1);
+            }
+            if (event.code == "Digit3") {
+                Bus.send("camera", 2);
+            }
+            if (event.code == "Numpad4") {
+                Bus.send("tweak1", 0.1);
+            }
+            if (event.code == "Numpad6") {
+                Bus.send("tweak1", -0.1);
+            }
+            if (event.code == "Numpad8") {
+                Bus.send("tweak2", 0.1);
+            }
+            if (event.code == "Numpad2") {
+                Bus.send("tweak2", -0.1);
+            }
+            if (event.code == "KeyY") {
+                Bus.send("RecordStart", 0.1);
+            }
+            if (event.code == "KeyU") {
+                Bus.send("RecordStop", 0.1);
+            }
+            if (event.code == "KeyO") {
+                Bus.send("RecordPlay", 0.1);
             }
         });
 

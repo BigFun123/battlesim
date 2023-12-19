@@ -12,13 +12,14 @@ let physics;
 let lerptime = 110.005;
 let delta = 0;
 let mission;
+let recorder;
 
 const createScene = async function () {
     // Creates a basic Babylon Scene object
     const scene = new BABYLON.Scene(engine);
     scene.gravity = new BABYLON.Vector3(0, -0.15, 0);
     scene.useRightHandedSystem = true;
-    kbd = new CKeyboard(scene);
+    kbd = new CKeyboard(scene);    
    
     gui = new CGUI(scene);
 
@@ -51,7 +52,7 @@ const createScene = async function () {
         { diameter: 2, segments: 32 }, scene);
     sphere.position.x = 10;
     sphere.position.y = 15;
-    const sphereAggregate = new BABYLON.PhysicsAggregate(sphere, BABYLON.PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.9, friction: 0.5 }, scene);
+    //const sphereAggregate = new BABYLON.PhysicsAggregate(sphere, BABYLON.PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.9, friction: 0.5 }, scene);
     // Built-in 'ground' shape.
     //const ground1 = BABYLON.MeshBuilder.CreateGround("ground",
     //  { width: 6, height: 6, subdivisions: 2 }, scene);
@@ -61,7 +62,7 @@ const createScene = async function () {
     // Create a built-in "ground" shape.
     const ground = BABYLON.MeshBuilder.CreateGround("ground",
         { width: 2, height: 2, subdivisions: 128 }, scene);
-    ground.position.y = -200;
+    ground.position.y = -50;
 
 
     sky = new CSky(scene);
@@ -69,7 +70,7 @@ const createScene = async function () {
     //BABYLON.NodeMaterial.ParseFromSnippetAsync("#3FU5FG#1", scene).then((mat) => {
     BABYLON.NodeMaterial.ParseFromFileAsync("ocean", "/assets/oceanMaterial.json", scene).then((mat) => {
         ground.material = mat;
-        ground.scaling = new BABYLON.Vector3(12000, 270, 12000);
+        ground.scaling = new BABYLON.Vector3(1000, 270, 1000);
         window.mat = mat;
     });
 
@@ -85,9 +86,18 @@ const createScene = async function () {
             //cameraMan.setParent(player1.mesh);
             
             cameraMan.setLockedTarget(player1.mesh);
+
+           
         });
         cameraMan = new CCameraMan(scene, new BABYLON.Vector3(-41, 110, -2110));
         
+
+        let npc = new CTerrain();
+        npc.load({file:"MiG-29.glb"}, false)
+            .then(() => {
+                console.log("npc loaded");
+                recorder = new CRecorder(scene, player1, npc.mesh);
+            });
 
     /*ship = new CShip("gerald ford carrier deck.glb", scene)
     ship.load(new BABYLON.Vector3(30, -70.5, 40), true)
@@ -101,6 +111,15 @@ const createScene = async function () {
 async function start() {
     const scene = await createScene(); //Call the createScene function
 
+   /* scene.onPointerObservable.add(function (e) {
+        // Mouse click.
+        // NOTE: Usually ignored if mouse moved.
+        if (e.type === BABYLON.PointerEventTypes.POINTERTAP) {
+            // Pointerlock on any click.
+            canvas.requestPointerLock()
+        }
+
+    })*/
 
     scene.registerBeforeRender(() => {
         //physics.update();
