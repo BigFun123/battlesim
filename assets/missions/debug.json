@@ -1,0 +1,23 @@
+[
+    {
+        "type": "map",
+        "xtile": 9028,
+        "ytile": 9835,
+        "ztile": 14
+    },
+    {
+        "type": "player",
+        "file": "vehicles/debug.glb",
+        "controller:": "jet",
+        "position": [
+            -2476,
+            25,
+            -339
+        ],
+        "rotation": [
+            0,
+            3.1071067811865476,
+            0
+        ]
+    }
+]

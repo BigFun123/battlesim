@@ -1,0 +1,32 @@
+[
+    {
+        "type": "fog",
+        "mode": "none"
+    },
+    {
+        "type": "zocean",
+        "position": [1000, 270, 1000]
+    },
+    {
+        "type": "map",
+        "name": "Ukraine",
+        "xtile": 9908,
+        "ytile": 5690,
+        "ztile": 14
+    },
+    {
+        "type": "player",
+        "file": "vehicles/MiG-29.glb",
+        "controller:": "jet",
+        "position": [
+            692,
+            268.0,
+            469.17
+        ],
+        "rotation" : [
+            0,
+            1.5,
+            0
+        ]
+    }
+]

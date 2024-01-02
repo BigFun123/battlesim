@@ -1,0 +1,105 @@
+[
+    {
+        "type": "dialog",
+        "text": "Mission 1 - An MQ-9 Reaper drone has malfunctions. Destroy it before it reaches the city. Warning: A passenger jet is flying nearby.",
+        "targets": [
+            "mq-9\ndrone"
+        ]
+    },
+    {
+        "type": "map",
+        "xtile": 9028,
+        "ytile": 9835,
+        "ztile": 14
+    },
+    {
+        "type": "staticmesh",
+        "file": "vehicles/gerald ford carrier RIGGED.glb",
+        "position": [
+            5356,
+            20,
+            4551
+        ],
+        "static": true
+    },
+    {
+        "type": "player",
+        "file": "vehicles/MiG-29.glb",
+        "controller:": "jet",
+        "position": [
+            -5356,
+            40,
+            4551
+        ],
+        "rotation" : [
+            0,
+            0.1071067811865476,
+            0
+        ]
+    },
+    {
+        "comment": " ======================================  NPC ======================================"
+    },
+    {
+        "type": "znpc",
+        "file": "MiG-29.glb",
+        "position": [
+            -91,
+            70,
+            -4890
+        ],
+        "recording": "recording3.json"
+    },
+    {
+        "type": "npc",
+        "id": "747-400\nhostages",
+        "file": "vehicles/747-400.glb",
+        "position": [
+            -191,
+            99970,
+            -4890
+        ],
+        "recording": "path_1.json",
+        "audio": "afterburner-sound-78165.mp3"
+    },
+    {
+        "type": "npc",
+        "id": "mq-9\ndrone",
+        "file": "vehicles/mq-9.glb",
+        "position": [
+            -91,
+            70,
+            -4890
+        ],
+        "recording": "recording5.json",
+        "audio": "afterburner-sound-78165.mp3"
+    },
+    {
+        "comment": " ======================================  TERRAIN ======================================"
+    },
+    {
+        "type": "sprite",
+        "file": "fx/explosion.png",
+        "position": [
+            -91,
+            70,
+            -4890
+        ]
+    },
+    {
+        "type": "zocean",
+        "position": [
+            0,
+            0,
+            0
+        ]
+    },
+    {
+        "type": "music",
+        "file": "Bleeping Demo.mp3"
+    },
+    {
+        "type": "zambient",
+        "file": "wind-outside-sound-ambient-141989.mp3"
+    }
+]

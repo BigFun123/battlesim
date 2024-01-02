@@ -1,0 +1,74 @@
+[
+    {
+        "type": "dialog",
+        "text": "Mission 1 - Destroy the MQ-9 Reaper Drone",
+        "targets": [
+            "enemy1"
+        ]
+    },
+    {
+        "comment": " ======================================  MAP ======================================"
+    },
+    {
+        "type": "map",
+        "name": "Cape Town",
+        "xtile": 9028,
+        "ytile": 9835,
+        "ztile": 14
+    },
+    {
+        "type": "staticmesh",
+        "file": "vehicles/gerald ford carrier RIGGED.glb",
+        "position": [
+            -2491,
+            5,
+            -290
+        ],
+        "static": true
+    },
+    {
+        "type": "player",
+        "file": "vehicles/MiG-29.glb",
+        "controller:": "jet",
+        "position": [
+            -2476,
+            25,
+            -339
+        ],
+        "rotation" : [
+            0,
+            3.1071067811865476,
+            0
+        ]
+    },
+    {
+        "comment": " ======================================  NPC ======================================"
+    },
+    
+    
+    
+    {
+        "type": "sprite",
+        "file": "fx/explosion.png",
+        "position": [
+            -91,
+            70,
+            -4890
+        ]
+    },  
+   
+    {
+        "type": "zocean",
+        "position": [
+            0,0,0
+        ]
+    },
+    {
+        "type": "music",
+        "file": "Bleeping Demo.mp3"
+    },
+    {
+        "type": "zambient",
+        "file": "wind-outside-sound-ambient-141989.mp3"
+    }
+]

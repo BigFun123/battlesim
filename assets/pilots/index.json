@@ -1,0 +1,37 @@
+[
+    {
+        "name": "Gabriel Phillips",
+        "icon": "GabrielPhillips.jpg",
+        "rating": 7.0
+    },
+    {
+        "name": "Yu Xu",
+        "icon": "YuXu.jpg",
+        "rating": 7.2
+    },
+    {
+        "name": "La Pho Han",
+        "icon": "LoPhoHan.jpg",
+        "rating": 4
+    },
+    {
+        "name": "Anita Nunes",
+        "icon": "AnitaNunes.jpg",
+        "rating": 6.1
+    },
+    {
+        "name": "Ute Schmitt",
+        "icon": "Ute Schmitt.jpg",
+        "rating": 9.2
+    },
+    {
+        "name": "Yoruba Watanabe",
+        "icon": "YorubaWatanabe.jpg",
+        "rating": 6.7
+    },
+    {
+        "name": "Michael Blewitt",
+        "icon": "MichaelBlewitt.jpg",
+        "rating": 8.4
+    }
+]

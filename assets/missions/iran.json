@@ -1,0 +1,70 @@
+[
+    {
+        "type": "fog",
+        "mode": "none"
+    },
+    {
+        "type": "zocean",
+        "position": [1000, 270, 1000]
+    },
+    {
+        "type": "map",
+        "name": "Iran",
+        "xtile": 10516,
+        "ytile": 6776,
+        "ztile": 14
+    },
+    {
+        "type": "player",
+        "file": "vehicles/MiG-29.glb",
+        "controller:": "jet",
+        "position": [
+            674,
+            366.5,
+            2203
+        ],
+        "rotation" : [
+            0,
+            1.5,
+            0
+        ]
+    },
+    {
+        "type" : "staticmesh",
+        "file" : "scenery/runway.glb",
+        "position" : [
+            692,
+            365.85,
+            2140
+        ],
+        "rotationQuaternion" : [
+            0,0,0,1
+        ]
+    },
+    {
+        "type" : "npc",
+        "id": "fuel depot",
+        "file" : "scenery/fuel.glb",
+        "position" : [
+            3506,
+            394.75,
+            3747.22
+        ],
+        "rotationQuaternion" : [
+            0,0,0,1
+        ]
+    },
+    {
+        "type" : "staticmesh",
+        "id": "fuel depot",
+        "file" : "scenery/fuel.glb",
+        "position" : [
+            -343,
+            292.75,
+            616.22
+        ],
+        "rotationQuaternion" : [
+            0,0,0,1
+        ]
+    }
+]

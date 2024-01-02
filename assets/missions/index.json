@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Training",
+        "description": "Get to know the aircraft",
+        "file": "training.json",
+        "icon": "training.jpg"
+    }, 
+    {
+        "name": "Cape Town",
+        "description": "Escort the 747 to safety",
+        "file": "capetown.json",
+        "icon": "capetown.jpg"
+    }, 
+    {
+        "name": "Iran",
+        "description": "Defeat rebels holding captives in the hospital", 
+        "file": "iran.json",
+        "icon": "iran.jpg"
+    },
+    {
+        "name": "Gaza",
+        "description": "Conduct reconnaissance of the area", 
+        "file": "gaza.json",
+        "icon": "gaza.jpg"
+    },
+    {
+        "name": "Ukraine",
+        "description": "Conduct reconnaissance of the area", 
+        "file": "ukraine.json",
+        "icon": "ukraine.jpg"
+    },
+    {
+        "name": "Debug",
+        "description": "Developer stuff", 
+        "file": "debug.json",
+        "icon": "debug.jpg"
+    }
+]
