@@ -118,7 +118,10 @@ export class CAircraft extends IVehicle {
         .then(result=>{
 
             this.bulletman = new CBullet(this.mesh, this.scene);
-
+            // set each mesn renderingGroupId to 2
+            result.meshes.forEach((mesh) => {
+                mesh.renderingGroupId = 2;
+            });
 
             result.animationGroups.forEach((animationGroup) => {                
                 animationGroup.enableBlending = true;
@@ -294,16 +297,14 @@ export class CAircraft extends IVehicle {
             if (missile.aggregate.body) {
                 missile.aggregate.body.disablePreStep = true;
             }
-            
-           
-    
-            var trail = new TrailMesh('orb trail', missile, this.scene, 0.2, 30, true);
-            const sourceMat = new StandardMaterial("sourceMat", this.scene);
-            sourceMat.emissiveColor = sourceMat.diffuseColor = new Color3(0.8, 0.75, 0.7);
-            sourceMat.specularColor = new Color3(1, 1, 0);
-            trail.material = sourceMat;
-            missile.trail = trail;        
         });
+
+        var trail = new TrailMesh('orb trail', missile, this.scene, 0.2, 30, true);
+        const sourceMat = new StandardMaterial("sourceMat", this.scene);
+        sourceMat.emissiveColor = sourceMat.diffuseColor = new Color3(0.8, 0.75, 0.7);
+        sourceMat.specularColor = new Color3(1, 1, 0);
+        trail.material = sourceMat;
+        missile.trail = trail;       
 
 
         // move the missile forward for 5 seconds        
@@ -325,6 +326,12 @@ export class CAircraft extends IVehicle {
                 //missile.aggregate = null;                
                 Bus.send("play-3daudio", { name: "massive-thump-116359.mp3", mesh: missile, volume: this.mode == this.INCOCKPIT ? 0.55 : 0.70 });
                 
+            }
+
+            if (missile.trail) {
+                missile.trail.stop();
+                missile.trail.dispose();
+                missile.trail = null;
             }
 
 
